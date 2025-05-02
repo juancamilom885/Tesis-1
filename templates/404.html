@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Página No Encontrada (404) - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5 py-5">
+    <h1 class="display-1 text-danger">404</h1>
+    <h2 class="mb-4">¡Oops! Página no encontrada.</h2>
+    <p class="lead mb-4">
+        La página que buscas no existe o fue movida.
+        Verifica la dirección URL o vuelve al inicio.
+    </p>
+    <a href="{{ url_for('home') }}" class="btn btn-primary btn-lg">
+       <i class="fas fa-home me-1"></i> Volver al Inicio
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+{% endblock %}

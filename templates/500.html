@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Error Interno del Servidor (500) - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5 py-5">
+    <h1 class="display-1 text-warning">500</h1>
+    <h2 class="mb-4">¡Oops! Algo salió mal.</h2>
+    <p class="lead mb-4">
+        Hemos encontrado un problema interno en el servidor.
+        Nuestro equipo técnico ha sido notificado. Por favor, intenta de nuevo más tarde.
+    </p>
+    <a href="{{ url_for('home') }}" class="btn btn-secondary btn-lg">
+       <i class="fas fa-arrow-left me-1"></i> Volver al Inicio
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+{% endblock %}

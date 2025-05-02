@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil de {{ user.name }} - {{ super() }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .profile-header {
+        background-color: #e9ecef;
+        padding: 30px 15px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+    .stats-card {
+        background-color: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+        height: 100%;
+    }
+     .service-card-profile {
+         border: 1px solid #dee2e6;
+         margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <img src="https://ui-avatars.com/api/?name={{ user.name|replace(' ', '+') }}&size=150&background=random&color=fff" class="profile-img mb-3" alt="Foto de perfil de {{ user.name }}">
+    <h2>{{ user.name }}</h2>
+    <p class="lead text-muted">{{ user.bio if user.bio else ('Proveedor de Servicios' if user.type == 'provider' else 'Usuario de la Plataforma') }}</p>
+    <span class="badge rounded-pill {% if user.type == 'provider' %}bg-success{% elif user.type == 'buyer' %}bg-primary{% else %}bg-secondary{% endif %} badge-type">
+        {{ user.type|capitalize }}
+    </span>
+     {# Botón de Contacto (si está logueado y no es su propio perfil) #}
+     {% if 'user_email' in session and session['user_email'] != email %}
+         <div class="mt-3">
+            {# Este botón necesitaría funcionalidad (ej. abrir modal, ir a chat, etc.) #}
+            <button class="btn btn-primary" disabled>
+                <i class="fas fa-envelope me-1"></i> Contactar (Próximamente)
+            </button>
+        </div>
+     {% endif %}
+</div>
+
+<div class="row">
+    {# Columna de Información #}
+    <div class="col-lg-4 mb-4">
+        <div class="stats-card">
+            <h4><i class="fas fa-info-circle me-2"></i>Información Pública</h4>
+            <hr>
+            <ul class="list-unstyled">
+                 {# Mostrar solo información pública relevante #}
+                 <li class="mb-2">
+                   <i class="fas fa-map-marker-alt me-2 text-muted"></i> <strong>Ubicación:</strong> {{ user.location if user.location else 'No especificada' }}
+                </li>
+                 {% if user.type == 'provider' %}
+                 <li class="mb-2">
+                    <i class="fas fa-phone me-2 text-muted"></i><strong>Teléfono:</strong> {{ user.phone if user.phone else 'No especificado' }}
+                </li>
+                 {# Podrías añadir website, etc. si lo tienes #}
+                 {% endif %}
+                 <li class="mb-2">
+                    <i class="fas fa-user-tag me-2 text-muted"></i><strong>Tipo:</strong> {{ user.type|capitalize }}
+                </li>
+            </ul>
+        </div>
+    </div>
+
+     {# Columna de Servicios (si es proveedor) #}
+     {% if user.type == 'provider' %}
+    <div class="col-lg-8 mb-4">
+          <div class="stats-card">
+            <h4><i class="fas fa-briefcase me-2"></i>Servicios Ofrecidos ({{ user.gallery|length }})</h4>
+             <hr>
+             {% if user.gallery %}
+                <div class="list-group">
+                 {% for item in user.gallery|sort(attribute='date', reverse=True) %}
+                    <div class="list-group-item service-card-profile">
+                         <div class="d-flex w-100 justify-content-between">
+                             <h5 class="mb-1">{{ item.title }}</h5>
+                             <small class="text-muted">{{ item.date.split(' ')[0] }}</small>
+                         </div>
+                         <p class="mb-1">{{ item.description|truncate(150) }}</p>
+                         <small class="text-muted">Precio: {{ item.price if item.price else 'A convenir' }}{% if item.price and item.price != 'A convenir' %} COP{% endif %}</small>
+                         {# Enlace a la imagen del servicio #}
+                         <a href="{{ url_for('static', filename='uploads/' + item.filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary float-end">Ver Imagen</a>
+                    </div>
+                 {% endfor %}
+                </div>
+             {% else %}
+                 <div class="alert alert-light text-center">
+                     Este proveedor no ha publicado ningún servicio todavía.
+                 </div>
+             {% endif %}
+         </div>
+     </div>
+     {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+{% endblock %}

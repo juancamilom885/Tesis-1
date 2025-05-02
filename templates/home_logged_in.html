@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="display-5">Bienvenido/a, {{ user.name }}</h1>
+    <p class="lead">Gestiona tus servicios, perfil y explora la comunidad.</p>
+    <div class="mt-4">
+        <a href="{{ url_for('gallery') }}" class="btn btn-primary btn-lg mx-2">Explorar Galería</a>
+        {% if user.type == 'provider' %}
+            <a href="{{ url_for('profile') }}" class="btn btn-success btn-lg mx-2">Mis Servicios</a>
+            <a href="{{ url_for('upload') }}" class="btn btn-info btn-lg mx-2">Subir Nuevo Servicio</a>
+        {% else %} {# Suponemos que es 'buyer' o 'admin' #}
+            <a href="{{ url_for('gallery') }}" class="btn btn-success btn-lg mx-2">Buscar Proveedores</a>
+             <a href="{{ url_for('profile') }}" class="btn btn-info btn-lg mx-2">Mi Perfil</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container my-5">
+    {% if user.type == 'provider' %}
+        <h2 class="text-center mb-4">Tus Servicios Recientes</h2>
+        <div class="row">
+            {% if user.gallery %}
+                {% for item in user.gallery[-3:]|reverse %} {# Mostrar los últimos 3 subidos #}
+                <div class="col-md-4 mb-4">
+                     <div class="card card-common user-card h-100">
+                        <a href="{{ url_for('static', filename='uploads/' + item.filename) }}" data-bs-toggle="tooltip" title="Ver imagen: {{ item.title }}">
+                            <img src="{{ url_for('static', filename='uploads/' + item.filename) }}" class="card-img-top gallery-img" alt="{{ item.title }}">
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                             <h5 class="card-title">{{ item.title }}</h5>
+                             <p class="card-text flex-grow-1">{{ item.description|truncate(100) }}</p>
+                             <p class="card-text"><strong>Precio:</strong> {{ item.price if item.price else 'A convenir' }}</p>
+                             <small class="text-muted">Subido: {{ item.date }}</small>
+                             </div>
+                    </div>
+                </div>
+                {% endfor %}
+                 {% if user.gallery|length > 3 %}
+                <div class="text-center mt-3">
+                    <a href="{{ url_for('profile') }}" class="btn btn-secondary">Ver Todos Mis Servicios</a>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        Aún no has subido ningún servicio. <a href="{{ url_for('upload') }}" class="alert-link">¡Sube tu primer servicio ahora!</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% else %} {# Para Compradores / Admin #}
+         <h2 class="text-center mb-4">Proveedores Destacados</h2>
+          <div class="row">
+            {% if featured_providers %}
+                 {% for provider in featured_providers %}
+                 <div class="col-md-4 mb-4">
+                     <div class="card card-common user-card h-100">
+                         <img src="https://ui-avatars.com/api/?name={{ provider.name|replace(' ', '+') }}&size=300&background=random&color=fff" class="card-img-top" alt="Logo {{ provider.name }}" style="height: 200px; object-fit: cover;">
+                         <div class="card-body d-flex flex-column">
+                             <h5 class="card-title">{{ provider.name }}</h5>
+                             <p class="card-text text-muted flex-grow-1">{{ provider.bio|truncate(80) if provider.bio else 'Proveedor de servicios.' }}</p>
+                             <p class="card-text"><small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i> {{ provider.location or 'Ubicación no disponible' }}</small></p>
+                             <a href="{{ url_for('view_profile', user_email=provider.email) }}" class="btn btn-outline-primary mt-auto">Ver Perfil</a>
+                         </div>
+                     </div>
+                 </div>
+                 {% endfor %}
+            {% else %}
+                 <div class="col-12">
+                    <div class="alert alert-secondary text-center">
+                        No hay proveedores destacados para mostrar en este momento.
+                    </div>
+                </div>
+            {% endif %}
+         </div>
+          <div class="text-center mt-3">
+            <a href="{{ url_for('gallery') }}" class="btn btn-secondary">Ver Todos los Servicios</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+// Habilitar tooltips de Bootstrap (si los usas)
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+</script>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Galería de Servicios - {{ super() }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .service-card {
+        transition: box-shadow .3s ease;
+    }
+    .service-card:hover {
+         box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    .provider-link {
+        text-decoration: none;
+        color: inherit; /* O un color específico */
+    }
+     .provider-link:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-5">Galería de Servicios</h1>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% if services %}
+        {% for item in services %}
+        <div class="col">
+            <div class="card h-100 card-common service-card">
+                 <a href="{{ url_for('static', filename='uploads/' + item.filename) }}" target="_blank" data-bs-toggle="tooltip" title="Ver imagen completa: {{ item.title }}">
+                    {# Fallback image si la imagen original no carga #}
+                    <img src="{{ url_for('static', filename='uploads/' + item.filename) }}"
+                         onerror="this.onerror=null; this.src='https://via.placeholder.com/300x250.png?text=Imagen+no+disponible';"
+                         class="card-img-top gallery-img" alt="{{ item.title }}">
+                </a>
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ item.title }}</h5>
+                    <p class="card-text flex-grow-1">{{ item.description }}</p>
+                    <p class="card-text mb-1">
+                        <strong>Precio:</strong> {{ item.price if item.price != 'A convenir' else 'A convenir' }}
+                        {% if item.price and item.price != 'A convenir' %}COP{% endif %}
+                    </p>
+                     <p class="card-text">
+                        <small class="text-muted">
+                            Ofrecido por:
+                            <a href="{{ url_for('view_profile', user_email=item.provider_email) }}" class="provider-link fw-bold">
+                                {{ item.provider_name }}
+                            </a>
+                            {% if item.provider_location %}
+                            <span class="ms-2"><i class="fas fa-map-marker-alt me-1"></i>{{ item.provider_location }}</span>
+                            {% endif %}
+                        </small>
+                    </p>
+                    <small class="text-muted">Publicado: {{ item.date.split(' ')[0] }}</small> {# Mostrar solo fecha #}
+                    {# Botón para ver más detalles o contactar podría ir aquí #}
+                     <a href="{{ url_for('view_profile', user_email=item.provider_email) }}" class="btn btn-sm btn-outline-primary mt-3 align-self-start">Contactar Proveedor</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-secondary text-center">
+                 <i class="fas fa-info-circle me-2"></i>No hay servicios publicados en la galería por el momento.
+                 {% if user_type == 'provider' %}
+                 <a href="{{ url_for('upload') }}" class="alert-link">¡Sé el primero en subir uno!</a>
+                 {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% if services %}
+{# Podrías añadir paginación aquí si la lista de servicios crece mucho #}
+{% endif %}
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+<script>
+// Habilitar tooltips de Bootstrap
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+</script>
+{% endblock %}

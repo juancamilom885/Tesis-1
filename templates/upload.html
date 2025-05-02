@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Subir Servicio - {{ super() }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .upload-card {
+        margin-top: 30px;
+        background-color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .preview-img {
+        max-height: 200px;
+        display: none; /* Oculta hasta que se seleccione imagen */
+        margin-top: 15px;
+        border-radius: 10px;
+        border: 1px solid #dee2e6; /* Borde sutil */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="upload-card">
+            <h2 class="text-center mb-4">Subir Nuevo Servicio</h2>
+             {# Los mensajes flash ya están en base.html #}
+            <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Título del Servicio <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="title" name="title" value="{{ title or '' }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descripción Detallada <span class="text-danger">*</span></label>
+                    <textarea class="form-control" id="description" name="description" rows="4" required>{{ description or '' }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="price" class="form-label">Precio (COP) <small class="text-muted">(Opcional, dejar vacío si es 'A convenir')</small></label>
+                    <input type="number" class="form-control" id="price" name="price" value="{{ price or '' }}" placeholder="Ej: 50000" min="0" step="1000">
+                </div>
+                <div class="mb-4">
+                    <label for="image" class="form-label">Imagen Representativa <span class="text-danger">*</span></label>
+                    <input class="form-control" type="file" id="image" name="image" accept="image/png, image/jpeg, image/gif" required>
+                    <small class="form-text text-muted">Formatos permitidos: PNG, JPG, GIF. Tamaño máximo: 16MB.</small>
+                    {# Vista previa de la imagen #}
+                    <div class="text-center">
+                        <img id="preview" class="preview-img" src="#" alt="Vista previa de la imagen">
+                    </div>
+                </div>
+                <p><span class="text-danger">*</span> Campos obligatorios</p>
+                <button type="submit" class="btn btn-primary w-100">Subir Servicio</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Script para mostrar la vista previa de la imagen seleccionada
+    const imageInput = document.getElementById('image');
+    const previewImage = document.getElementById('preview');
+
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            // Verificar tipo de archivo (opcional, ya se hace en backend)
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/gif'];
+            if (allowedTypes.includes(file.type)) {
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block'; // Mostrar la imagen
+                }
+                reader.readAsDataURL(file); // Leer el archivo como Data URL
+            } else {
+                 previewImage.src = '#';
+                 previewImage.style.display = 'none'; // Ocultar si no es válido
+                 // Podrías mostrar un mensaje de error aquí también
+                 alert('Formato de archivo no válido. Por favor, selecciona PNG, JPG o GIF.');
+                 imageInput.value = ''; // Limpiar el input
+            }
+        } else {
+            previewImage.src = '#';
+            previewImage.style.display = 'none'; // Ocultar si no hay archivo
+        }
+    });
+</script>
+{% endblock %}
