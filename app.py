@@ -1,8 +1,10 @@
 # app.py
 import os
 from datetime import datetime
+import json
+from datetime import datetime
 from flask import (Flask, render_template, request, redirect, url_for,
-                   session, flash) # 'jsonify' no se usó, se puede quitar si no lo necesitas
+                   session, flash, jsonify) # 'jsonify' no se usó, se puede quitar si no lo necesitas
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 import logging # Para un mejor logging
@@ -74,6 +76,137 @@ users_db = {
     }
 }
 
+pymes_data = {
+  "pymes": [
+    {
+      "id": 1,
+      "nombre": "Panadería La Especial",
+      "tipo": "proveedor",
+      "categoria": "alimentos",
+      "ubicacion": "Bogotá",
+      "servicios": [
+        "Panadería artesanal",
+        "Pastelería",
+        "Catering para eventos"
+      ],
+      "fundacion": 2015,
+      "empleados": 8,
+      "telefono": "+57 310 123 4567",
+      "email": "contacto@panaderialaespecial.com",
+      "redes_sociales": {
+        "facebook": "PanaderiaLaEspecial",
+        "instagram": "@panaderia_especial"
+      },
+      "calificacion": 4.7
+    },
+    {
+      "id": 2,
+      "nombre": "Diseños Creativos SAS",
+      "tipo": "proveedor",
+      "categoria": "diseño",
+      "ubicacion": "Medellín",
+      "servicios": [
+        "Diseño gráfico",
+        "Branding",
+        "Diseño web"
+      ],
+      "fundacion": 2018,
+      "empleados": 5,
+      "telefono": "+57 320 987 6543",
+      "email": "info@disenoscreativos.com",
+      "redes_sociales": {
+        "facebook": "DisenosCreativosSAS",
+        "instagram": "@disenos_creativos"
+      },
+      "calificacion": 4.9
+    },
+    {
+      "id": 3,
+      "nombre": "Limpieza Express",
+      "tipo": "proveedor",
+      "categoria": "servicios",
+      "ubicacion": "Cali",
+      "servicios": [
+        "Limpieza residencial",
+        "Limpieza comercial",
+        "Limpieza post-construcción"
+      ],
+      "fundacion": 2020,
+      "empleados": 12,
+      "telefono": "+57 315 456 7890",
+      "email": "servicio@limpiezaexpress.com",
+      "redes_sociales": {
+        "facebook": "LimpiezaExpressCol",
+        "instagram": "@limpieza_express"
+      },
+      "calificacion": 4.5
+    },
+    {
+      "id": 4,
+      "nombre": "Restaurante Sabores del Valle",
+      "tipo": "comprador",
+      "categoria": "restaurante",
+      "ubicacion": "Pereira",
+      "necesidades": [
+        "Proveedores de alimentos orgánicos",
+        "Servicios de limpieza profesional",
+        "Diseño de menú digital"
+      ],
+      "fundacion": 2019,
+      "empleados": 15,
+      "telefono": "+57 300 123 9876",
+      "email": "contacto@saboresdelvalle.com",
+      "redes_sociales": {
+        "facebook": "SaboresDelValle",
+        "instagram": "@sabores_valle"
+      },
+      "calificacion": 4.8
+    },
+    {
+      "id": 5,
+      "nombre": "TechSolutions",
+      "tipo": "proveedor",
+      "categoria": "tecnologia",
+      "ubicacion": "Barranquilla",
+      "servicios": [
+        "Desarrollo de software",
+        "Soporte técnico",
+        "Consultoría IT"
+      ],
+      "fundacion": 2017,
+      "empleados": 10,
+      "telefono": "+57 318 765 4321",
+      "email": "soporte@techsolutions.co",
+      "redes_sociales": {
+        "facebook": "TechSolutionsCO",
+        "instagram": "@tech_solutions_co"
+      },
+      "calificacion": 4.6
+    }
+  ],
+  "estadisticas": {
+    "total_pymes": 5,
+    "proveedores": 4,
+    "compradores": 1,
+    "categorias": [
+      "alimentos",
+      "diseño",
+      "servicios",
+      "tecnologia",
+      "restaurante"
+    ],
+    "promedio_calificacion": 4.7,
+    "ciudades": [
+      "Bogotá",
+      "Medellín",
+      "Cali",
+      "Pereira",
+      "Barranquilla"
+    ]
+  },
+  "fecha_generacion": datetime.now().strftime("%Y-%m-%d"),
+  "version": "1.0"
+}
 # --- Funciones Auxiliares ---
 def allowed_file(filename):
     """Verifica si la extensión del archivo está permitida."""
@@ -154,6 +287,21 @@ def home():
         ][:3]
         return render_template('home_logged_out.html', featured_providers=featured_providers)
 
+@app.route('/pymes', methods=['GET'])
+def get_pymes():
+    # Devuelve los datos en formato JSON con el encabezado adecuado
+    return jsonify(pymes_data)
+
+@app.route('/pymes/<int:pyme_id>', methods=['GET'])
+def get_pyme(pyme_id):
+    # Busca una PYME específica por ID
+    for pyme in pymes_data['pymes']:
+        if pyme['id'] == pyme_id:
+            return jsonify(pyme)
+    # Si no se encuentra, devuelve un error 404
+    return jsonify({"error": "PYME no encontrada"}), 404
+
+    
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Maneja el inicio de sesión de usuarios."""
