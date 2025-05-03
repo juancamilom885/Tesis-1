@@ -1,59 +1,14 @@
-import React from "react";
+// src/routes/Login.tsx
+import React from 'react';
+import Login2 from '../components/Login2'; // Adjusted path
 
-function Login() {
+const Login: React.FC = () => {
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-6 col-lg-5">
-        <div className="login-card">
-          <h2 className="text-center mb-4">Iniciar Sesión</h2>
-          <form method="POST" action="{{ url_for('login') }}">
-            <div className="mb-3">
-              <label className="form-label">Correo Electrónico</label>
-              <input
-                type="email"
-                className="form-control"
-                id="email"
-                name="email"
-                value="{{ email or '' }}"
-                required
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Contraseña</label>
-              <input
-                type="password"
-                className="form-control"
-                id="password"
-                name="password"
-                required
-              />
-            </div>
-            <div className="mb-3 form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="remember"
-                name="remember"
-              />
-              <label className="form-check-label">Recordarme</label>
-            </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Iniciar Sesión
-            </button>
-          </form>
-          <div className="mt-3 text-center">
-            <p>
-              ¿No tienes una cuenta?{" "}
-              <a href="{{ url_for('register') }}">Regístrate</a>
-            </p>
-            <p>
-              <a href="#">¿Olvidaste tu contraseña?</a>
-            </p>
-          </div>
-        </div>
-      </div>
+    // Example full-screen background for the login page
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-protocol-green via-teal-400 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
+        <Login2 /> {/* Render the actual form component */}
     </div>
   );
-}
+};
 
 export default Login;

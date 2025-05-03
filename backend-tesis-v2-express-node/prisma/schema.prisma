@@ -1,0 +1,45 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUM PARA TIPO DE USUARIO ---
+// Define los posibles roles/tipos de usuario que puedes tener
+enum UserRole {
+  ADMIN     // Ejemplo: Administrador del sistema
+  PYME      // Ejemplo: Usuario tipo PYME
+  CLIENTE   // Ejemplo: Usuario tipo Cliente final
+  // Puedes añadir o quitar roles según necesites
+}
+
+// --- MODELO USER ACTUALIZADO ---
+model User {
+  id        String   @id @default(cuid()) // ID único
+  name      String   // Nombre (ahora obligatorio)
+  email     String   @unique // Email único (tu campo 'mail')
+  password  String   // Contraseña hasheada (tu campo 'contraseña')
+  role      UserRole @default(CLIENTE) // Tipo de usuario (usa el enum), con un valor por defecto
+  sector    String?  // Sector (opcional, String?)
+
+  createdAt DateTime @default(now()) // Fecha de creación
+  updatedAt DateTime @updatedAt // Fecha de última actualización
+
+  // Relaciones futuras...
+  // pymes Pyme[]
+  // clientes Cliente[]
+}
+
+// Aquí puedes añadir otros modelos (Pyme, Servicio, Cliente, etc.)
+// model Pyme {
+//   id        String   @id @default(cuid())
+//   name      String
+//   // ... otros campos ...
+//   owner     User?    @relation(fields: [ownerId], references: [id]) // Ejemplo relación
+//   ownerId   String?
+// }

@@ -1,0 +1,28 @@
+version: '3.8' # Especifica la versión de Docker Compose
+
+services:
+  # Nombre del servicio de la base de datos (puedes llamarlo como quieras)
+  postgres_db:
+    image: postgres:15 # Usa una imagen oficial de PostgreSQL (versión 15 recomendada)
+    container_name: tesis_postgres_db # Nombre opcional para el contenedor
+    environment:
+      POSTGRES_USER: postgres_user # Nombre de usuario para la BD
+      POSTGRES_PASSWORD: postgres_password # Contraseña (¡Cámbiala por algo seguro si quieres!)
+      POSTGRES_DB: tesis_db # Nombre de la base de datos que se creará
+    ports:
+      - "5433:5432" # Mapea el puerto 5433 de tu máquina al 5432 del contenedor
+                    # (Usa 5433 para evitar conflictos si ya tienes Postgres en 5432)
+    volumes:
+      - tesis_pgdata:/var/lib/postgresql/data # Persiste los datos de la BD en un volumen llamado 'tesis_pgdata'
+    restart: unless-stopped # Reinicia el contenedor si se detiene, a menos que lo detengas tú manualmente
+    networks:
+      - tesis_network # Conecta el servicio a una red personalizada
+
+# Define los volúmenes nombrados
+volumes:
+  tesis_pgdata: # El volumen donde se guardarán los datos
+
+# Define las redes personalizadas
+networks:
+  tesis_network: # La red para comunicar servicios (útil si añades más servicios después)
+    driver: bridge
